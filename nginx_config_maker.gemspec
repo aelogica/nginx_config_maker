@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = NginxConfigMaker::VERSION
   spec.authors       = ["Ramon Tayag"]
   spec.email         = ["ramon@aelogica.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{Generate Nginx conguration using Ruby}
+  spec.description   = %q{Generate Nginx conguration using Ruby}
   spec.homepage      = ""
   spec.license       = "MIT"
 
