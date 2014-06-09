@@ -55,6 +55,11 @@ server {
     proxy_set_header X-Forwarded-Port \$server_port;
     proxy_set_header X-Request-Start \$msec;
   }
+  location ^~ /assets/ {
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+  }
 }
 ```
 
@@ -65,19 +70,27 @@ server = NginxConfigMaker::Server.new(
   listen: ["[::]:80", "80"],
   server_name: "app_123",
   location: [
-    "/",
-    proxy: {
-      pass: "http://app_123",
-      http_version: "1.1",
-      set_headers: {
-        "Upgrade": "\$http_upgrade",
-        "Connection": %Q("upgrade"),
-        "Host": "\$http_host",
-        "X-Forwarded-Proto": "\$scheme",
-        "X-Forwarded-For": "\$remote_addr",
-        "X-Forwarded-Port": "\$server_port",
-        "X-Request-Start": "\$msec",
+    {
+      at: "/",
+      proxy: {
+        pass: "http://app_123",
+        http_version: "1.1",
+        set_headers: {
+          "Upgrade" => "\$http_upgrade",
+          "Connection" => %Q("upgrade"),
+          "Host" => "\$http_host",
+          "X-Forwarded-Proto" => "\$scheme",
+          "X-Forwarded-For" => "\$remote_addr",
+          "X-Forwarded-Port" => "\$server_port",
+          "X-Request-Start" => "\$msec",
+        }
       }
+    },
+    {
+      at: '^~ /assets/',
+      gzip_static: 'on',
+      expires: 'max',
+      add_header: 'Cache-Control public'
     }
   ]
 )

@@ -21,11 +21,11 @@ module NginxConfigMaker
         parts << "  server_name #{server_name};"
       end
 
-      if location
-        location_opts = {at: location.first}
-        location_opts.merge!(location[1])
-        lines = Location.new(location_opts).to_a
-        parts += lines.map {|line| "  #{line}"}
+      if location && location.any?
+        location.each do |location_opts|
+          lines = Location.new(location_opts).to_a
+          parts += lines.map {|line| "  #{line}"}
+        end
       end
 
       parts << "}"

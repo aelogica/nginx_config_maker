@@ -9,7 +9,7 @@ module NginxConfigMaker
           listen: 80,
           server_name: "app.com",
           location: [
-            "/",
+            at: "/",
             proxy: {
               pass: "http://app",
               set_headers: {
@@ -77,7 +77,7 @@ module NginxConfigMaker
         it "generates config with a location" do
           config = described_class.new(
             location: [
-              "/",
+              at: "/",
               proxy: {pass: "http://app"}
             ]
           )
@@ -94,6 +94,32 @@ module NginxConfigMaker
           )).and_return(location)
 
           expect(config.to_s).to eq expected_config
+        end
+      end
+
+      context 'given multiple locations' do
+        it 'generates config with multiple location blocks' do
+          config = described_class.new(
+            location: [
+              {at: '/', proxy: {pass: 'http://app'}},
+              {at: '^~ /assets/', gzip_static: 'on', expires: 'max', add_header: 'Cache-Control public'}
+            ]
+          )
+
+          expected_config = <<-EOQ.dedent
+          server {
+            location / {
+              proxy_pass http://app;
+            }
+            location ^~ /assets/ {
+              gzip_static on;
+              expires max;
+              add_header Cache-Control public;
+            }
+          }
+          EOQ
+
+          expect(config.to_s).to eq(expected_config)
         end
       end
     end
