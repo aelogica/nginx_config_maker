@@ -25,6 +25,30 @@ module NginxConfigMaker
           expect(config.to_s).to eq expected_config
         end
       end
+
+      context "given a few other options" do
+        it "generates location config with a few other options" do
+          config = described_class.new(
+            at: "^~ /assets/",
+            gzip_static: 'on',
+            expires: 'max',
+            add_header: 'Cache-Control public'
+          )
+
+          expected_config = <<-EOQ.dedent
+          location ^~ /assets/ {
+            gzip_static on;
+            expires max;
+            add_header Cache-Control public;
+          }
+          EOQ
+
+          proxy = double(to_a: ["proxy_pass http://app;"])
+          allow(Proxy).to receive(:new).with(pass: "http://app") { proxy }
+
+          expect(config.to_s).to eq expected_config
+        end
+      end
     end
 
     describe "#to_a" do
