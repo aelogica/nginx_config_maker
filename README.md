@@ -23,6 +23,9 @@ To generate upstream configuration like this:
 ```
 upstream app_123 {
   server 127.0.0.1:12380;
+  server api.example.com;
+  server api2.example.com:1234 fail_timeout=60 max_fails=3;
+  server unix:/tmp/api3.sock;
 }
 ```
 
@@ -31,8 +34,12 @@ do:
 ```ruby
 upstream = NginxConfigMaker::Upstream.new(
   name: "app_123",
-  host: "127.0.0.1",
-  port: "12380",
+  instances: [
+    {host: "127.0.0.1",port:12380},
+    {host: "api.example.com"},
+    {host: "api2.example.com", port:1234, fail_timeout:60, max_fails:3}
+    {host: "unix:/tmp/api3.sock"}
+  ]
 )
 upstream.to_s
 ```
